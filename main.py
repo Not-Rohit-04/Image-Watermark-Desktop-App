@@ -25,7 +25,9 @@ def upload_img():
 
     if file_path:
         img = Image.open(file_path)
-        img.thumbnail((200,200))
+        img_label.config(text="")
+        img_label.config(width=0,height=0)
+        img.thumbnail((400,400))
         tk_img = ImageTk.PhotoImage(img)
         img_label.config(image=tk_img)
         img_label.image = tk_img
@@ -36,23 +38,31 @@ icon_img = PhotoImage(file='assets/icon-img.png')
 canvas.create_image(100,100,image=icon_img)
 canvas.create_text(100,160,text='Mark-It',font=("Helvetica", 10, "bold"))
 canvas.Image = icon_img
-canvas.grid(row=0,column=1,columnspan=1,padx=20,pady=20)
+canvas.grid(row=0,column=1,columnspan=1,padx=20,pady=10)
         
 
 img_label = Label(window)
-img_label.config(text='Select A image',width=45,height=15,foreground='blue',bg=Img_label_bg)
+img_label.config(text='Clikc Upload to upload an image to add watermark',width=45,height=15,foreground='blue',bg=Img_label_bg)
 img_label.grid(row=1,column=1,padx=20,pady=20)       
         
 
 upload_button = Button(window,text='Upload',command=upload_img)
 upload_button.config(width=20)
-upload_button.grid(row=2,column=0,padx=20,pady=20)
+upload_button.grid(row=3,column=0,padx=20,pady=20)
     
     
-mark_it_button = Button(window,text='Mark-It')
-mark_it_button.config(width=20)
-mark_it_button.grid(row=2,column=2,padx=20,pady=20)
+add_watermark = Button(window,text='Add Watermark')
+add_watermark.config(width=20)
+add_watermark.grid(row=3,column=2,padx=20,pady=20)
 
 
+watermark_label = Label(window,text='Enter Watermark')
+watermark_label.config(background=Win_bg,width=20)
+watermark_label.grid(row=2,column=1,padx=20,)
+
+watermark_entry = Entry(window)
+watermark_entry.focus_set()
+watermark_entry.config(width=40)
+watermark_entry.grid(row=3,column=1,padx=20)
 
 window.mainloop()
