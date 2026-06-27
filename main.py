@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import filedialog , messagebox
+from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from pathlib import Path
 
@@ -17,43 +17,90 @@ home_dir = Path.home()
 img = None
 save_img = None
 
-def image_save():
-    global save_img
-    save_path = filedialog.asksaveasfilename(
-        parent=window,
-        initialdir=home_dir,
-        title="Save Watermarked Image",
-        defaultextension=".png",
-        filetypes=[
-            ("PNG Image", "*.png"),
-            ("JPEG Image", "*.jpg;*.jpeg"),
-            ("All Files", "*.*")
-        ]
+
+def reset():
+    global save_img, img
+    save_button.config(state="disable")
+    watermark_entry.delete(0, END)
+    watermark_entry.focus_set()
+    img_label.config(
+        image="",
+        text="Clikc Upload to upload an image to add watermark",
+        width=45,
+        height=15,
+        foreground="blue",
+        bg=Img_label_bg,
+        wraplength=300,
+        justify="center",
     )
-    
-    if save_path:
-        try:
-            save_img.save(save_path)
-            messagebox.showinfo("Success", "Image saved successfully!")
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not save image.\nError: {e}")
+    img_label.image = None
+    img = None
+    save_img = None
+
+
+def image_save():
+    global save_img, img
+    watermark = watermark_entry.get()
+    ok_cancle = messagebox.askokcancel(
+        title="Want to add watermark?",
+        message=f"Do you want to add ©{watermark} to the image.",
+    )
+    if ok_cancle == True:
+
+        save_path = filedialog.asksaveasfilename(
+            parent=window,
+            initialdir=home_dir,
+            title="Save Watermarked Image",
+            defaultextension=".png",
+            filetypes=[
+                ("PNG Image", "*.png"),
+                ("JPEG Image", "*.jpg;*.jpeg"),
+                ("All Files", "*.*"),
+            ],
+        )
+
+        if save_path:
+            try:
+                save_img.save(save_path)
+                reset()
+                messagebox.showinfo("Success", "Image saved successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not save image.\nError: {e}")
+                return
+
 
 def watermark_addition():
-    global img,save_img
-    mark = watermark_entry.get()
-    base_img = img.copy()
-    draw = ImageDraw.Draw(base_img)
-    font = ImageFont.truetype("arial.ttf", size=36)
-    draw.text((50, 50), mark, fill=(255, 255, 255), font=font)
-    preview_img = base_img.copy()
-    preview_img.thumbnail((360, 240), Image.Resampling.LANCZOS)
-    tk_img = ImageTk.PhotoImage(preview_img)
-    img_label.config(text="", image=tk_img)
-    img_label.image = tk_img
-    save_img = base_img
-    save_button.config(state='normal')
+    global img, save_img
+
+    if img is None:
+        messagebox.showerror(
+            title="No File Uploaded",
+            message="Upload a file first to add a water mark on it.",
+        )
+        watermark_entry.delete(0, END)
+        return
+    else:
+        mark = watermark_entry.get()
+        if not mark.strip():
+            messagebox.showerror(title="ERROR", message="Add a valid watermark.")
+            watermark_entry.delete(0, END)
+            return
+        copyright_mark = f"©{mark}"
+        base_img = img.copy()
+        draw = ImageDraw.Draw(base_img)
+        font = ImageFont.truetype("arial.ttf", size=36)
+        draw.text((50, 50), copyright_mark, fill=(255, 255, 255), font=font)
+        preview_img = base_img.copy()
+        preview_img.thumbnail((360, 240), Image.Resampling.LANCZOS)
+        tk_img = ImageTk.PhotoImage(preview_img)
+        img_label.config(text="", image=tk_img)
+        img_label.image = tk_img
+        save_img = base_img
+        save_button.config(state="normal")
+
 
 def upload_img():
+    global img
     file_path = filedialog.askopenfilename(
         parent=window,
         initialdir=home_dir,
@@ -62,7 +109,6 @@ def upload_img():
     )
 
     if file_path:
-        global img
         img = Image.open(file_path)
         preview = img.copy()
         img_label.config(text="")
@@ -122,8 +168,8 @@ watermark_entry.focus_set()
 watermark_entry.config(width=40)
 watermark_entry.grid(row=3, column=1, padx=20)
 
-save_button = Button(window,text='Save',command=image_save)
-save_button.config(width=30,state='disabled')
+save_button = Button(window, text="Save", command=image_save)
+save_button.config(width=30, state="disabled")
 save_button.grid(row=4, column=1, padx=20, pady=20)
 
 window.mainloop()
