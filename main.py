@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import Tk, filedialog
+from tkinter import filedialog , messagebox
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from pathlib import Path
 
@@ -15,10 +15,31 @@ window.title("Mark-IT")
 home_dir = Path.home()
 
 img = None
+save_img = None
 
+def image_save():
+    global save_img
+    save_path = filedialog.asksaveasfilename(
+        parent=window,
+        initialdir=home_dir,
+        title="Save Watermarked Image",
+        defaultextension=".png",
+        filetypes=[
+            ("PNG Image", "*.png"),
+            ("JPEG Image", "*.jpg;*.jpeg"),
+            ("All Files", "*.*")
+        ]
+    )
+    
+    if save_path:
+        try:
+            save_img.save(save_path)
+            messagebox.showinfo("Success", "Image saved successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save image.\nError: {e}")
 
 def watermark_addition():
-    global img
+    global img,save_img
     mark = watermark_entry.get()
     base_img = img.copy()
     draw = ImageDraw.Draw(base_img)
@@ -29,7 +50,8 @@ def watermark_addition():
     tk_img = ImageTk.PhotoImage(preview_img)
     img_label.config(text="", image=tk_img)
     img_label.image = tk_img
-
+    save_img = base_img
+    save_button.config(state='normal')
 
 def upload_img():
     file_path = filedialog.askopenfilename(
@@ -99,5 +121,9 @@ watermark_entry = Entry(window)
 watermark_entry.focus_set()
 watermark_entry.config(width=40)
 watermark_entry.grid(row=3, column=1, padx=20)
+
+save_button = Button(window,text='Save',command=image_save)
+save_button.config(width=30,state='disabled')
+save_button.grid(row=4, column=1, padx=20, pady=20)
 
 window.mainloop()
