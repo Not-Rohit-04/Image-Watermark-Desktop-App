@@ -41,9 +41,16 @@ canvas.Image = icon_img
 canvas.grid(row=0,column=1,columnspan=1,padx=20,pady=10)
         
 
-img_label = Label(window)
-img_label.config(text='Clikc Upload to upload an image to add watermark',width=45,height=15,foreground='blue',bg=Img_label_bg)
-img_label.grid(row=1,column=1,padx=20,pady=20)       
+
+container_frame = Frame(window,width=360,height=240,bg=Img_label_bg)
+container_frame.grid(row=1, column=1, padx=20, pady=20)
+
+container_frame.pack_propagate(False)
+container_frame.grid_propagate(False)
+
+img_label = Label(container_frame)
+img_label.config(text='Clikc Upload to upload an image to add watermark',width=45,height=15,foreground='blue',bg=Img_label_bg,wraplength=300,justify='center')
+img_label.pack(expand=True,fill='both')     
         
 
 upload_button = Button(window,text='Upload',command=upload_img)
